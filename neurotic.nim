@@ -25,6 +25,8 @@ type
     lastInput: DVector64
   Sigmoid64 = ref object of RootObj
     lastInput: DVector64
+  Relu64 = ref object of RootObj
+    lastInput: DVector64
   Sequential1 = ref object of RootObj
     modules: seq[IModule64]
   QuadraticCost = object
@@ -90,8 +92,15 @@ proc sigmoid(z: float64): float64 = 1.0 / (exp(-z) + 1.0)
 
 proc sigmoidPrime(z: float64): float64 = sigmoid(z) * (1.0 - sigmoid(z))
 
+proc relu(z: float64): float64 = max(z, 0.0)
+
+proc reluPrime(z: float64): float64 =
+  if z >= 0: 1.0 else: 0.0
+
 makeUniversal(sigmoid)
 makeUniversal(sigmoidPrime)
+makeUniversal(relu)
+makeUniversal(reluPrime)
 
 proc forward(m: Sigmoid64, x: DVector64): DVector64 =
   m.lastInput = x
@@ -99,6 +108,13 @@ proc forward(m: Sigmoid64, x: DVector64): DVector64 =
 
 proc backward(m: Sigmoid64, v: DVector64, eta: float64): DVector64 =
   sigmoidPrime(m.lastInput) |*| v
+
+proc forward(m: Relu64, x: DVector64): DVector64 =
+  m.lastInput = x
+  return relu(x)
+
+proc backward(m: Relu64, v: DVector64, eta: float64): DVector64 =
+  reluPrime(m.lastInput) |*| v
 
 proc run(m: IModule64, c: Cost64, input, output: DVector64, eta = 0.01'f64): Result64 =
   let
@@ -116,7 +132,8 @@ when isMainModule:
     cost = QuadraticCost()
   var
     m1 = l1.withMemory
-    m2 = Sigmoid64()
+    # m2 = Sigmoid64()
+    m2 = Relu64()
     m3 = l2.withMemory
     m4 =(m1 -> m2) -> m3
   let
