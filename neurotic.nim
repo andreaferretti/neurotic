@@ -100,7 +100,7 @@ proc into[A: Module64; B: Module64](a: A, b: B): Closure64 =
   return Closure64(fwd: fwd, bkd: bkd)
 
 
-proc `->`[A; B](a: var A, b: var B): auto =
+proc `->`[A: Module64; B: Module64](a: var A, b: var B): auto =
   Sequential[A, B](module1: a, module2: b)
 
 proc forward(m: QuadraticCost, x, y: DVector64): float64 = l_2(x - y)
