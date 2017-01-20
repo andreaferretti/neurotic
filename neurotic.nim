@@ -127,17 +127,11 @@ when isMainModule:
     m1 = l1.withMemory
     m2 = Sigmoid64()
     m3 = l2.withMemory
-    # m4 = m1 -> m3
-    m5 = m1 -> m2 -> m3
-    # m5 = m3 -> m4
-    # m5 = m4 -> m3
+    m4 =(m1 -> m2) -> m3
   let
     v = randomVector(784).toDynamic
     w = randomVector(20).toDynamic
 
-  let result = run(m5.asIModule64, cost, v, w)
+  let result = run(m4.asIModule64, cost, v, w)
   echo result.gradient
   echo result.loss
-  # echo((m1 -> m2) is Module64)
-  # echo((m2 -> m3) is Module64)
-  # echo((m1 -> m3) is Module64)
