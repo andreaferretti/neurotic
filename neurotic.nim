@@ -9,7 +9,7 @@ type
     # m.forward(x) is DMatrix64
     m.forward(y) is DVector64
     # m.backward(x) is DMatrix64
-    m.backward(y) is DVector64
+    # m.backward(y) is DVector64
   Cost64 = concept m
     # var x: DMatrix64
     var y, t: DVector64
@@ -35,6 +35,9 @@ type
   Sequential[A, B] = object
     module1: A
     module2: B
+  Closure64 = object
+    fwd: DVector64 -> DVector64
+    bkd: (DVector64, float64) -> DVector64
   QuadraticCost = object
 
 var rng = initMersenneTwister(urandom(16))
@@ -58,9 +61,11 @@ proc forward(m: var Dense64Module, x: DVector64): DVector64 =
   m.lastInput = x
   return (m.memory.weights * x) + m.memory.bias
 
+# External (tensor) product
 proc `.*`(a, b: DVector64): DMatrix64 =
   makeMatrix(a.len, b.len, proc(i, j: int): float64 = a[i] * b[j])
 
+# Hadamard (component-wise) product
 proc `|*|`(a, b: DVector64): DVector64 =
   assert a.len == b.len
   result = newSeq[float64](a.len)
@@ -79,7 +84,23 @@ proc forward[A, B: Module64](m: var Sequential[A, B], x: DVector64): DVector64 =
 proc backward[A, B: Module64](m: var Sequential[A, B], x: DVector64, eta = 0.01'f64): DVector64 =
   m.module1.backward(m.module2.backward(x, eta), eta)
 
-proc `->`[A; B](a: A, b: B): auto =
+proc forward(m: var Closure64, x: DVector64): DVector64 = m.fwd(x)
+
+proc backward(m: var Closure64, x: DVector64, eta = 0.01'f64): DVector64 = m.bkd(x, eta)
+
+proc into[A: Module64; B: Module64](a: A, b: B): Closure64 =
+  var a1 = a
+  var b1 = b
+
+  proc fwd(x: DVector64): DVector64 = b1.forward(a1.forward(x))
+
+  proc bkd(x: DVector64, eta: float64): DVector64 =
+    a1.backward(b1.backward(x, eta), eta)
+
+  return Closure64(fwd: fwd, bkd: bkd)
+
+
+proc `->`[A; B](a: var A, b: var B): auto =
   Sequential[A, B](module1: a, module2: b)
 
 proc forward(m: QuadraticCost, x, y: DVector64): float64 = l_2(x - y)
@@ -129,6 +150,9 @@ when isMainModule:
   echo result.loss
   echo m1 is Module64
   echo m2 is Module64
+  # echo((m1 -> m2) is Module64)
+  # echo((m2 -> m3) is Module64)
+  # echo((m1 -> m3) is Module64)
   echo l1 is Layer64
   echo m2 is Module64
   echo cost is Cost64
