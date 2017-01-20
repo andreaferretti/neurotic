@@ -30,6 +30,8 @@ type
   Dense64Module = object
     memory: Dense64Memory
     lastInput: DVector64
+  Sigmoid64 = object
+    lastInput: DVector64
   Sequential[A, B] = object
     module1: A
     module2: B
@@ -59,6 +61,12 @@ proc forward(m: var Dense64Module, x: DVector64): DVector64 =
 proc `.*`(a, b: DVector64): DMatrix64 =
   makeMatrix(a.len, b.len, proc(i, j: int): float64 = a[i] * b[j])
 
+proc `|*|`(a, b: DVector64): DVector64 =
+  assert a.len == b.len
+  result = newSeq[float64](a.len)
+  for i in 0 .. < a.len:
+    result[i] = a[i] * b[i]
+
 proc backward(m: var Dense64Module, v: DVector64, eta = 0.01'f64): DVector64 =
   result = m.memory.weights.t * v
   let gradWeights = v .* m.lastInput
@@ -71,7 +79,7 @@ proc forward[A, B: Module64](m: var Sequential[A, B], x: DVector64): DVector64 =
 proc backward[A, B: Module64](m: var Sequential[A, B], x: DVector64, eta = 0.01'f64): DVector64 =
   m.module1.backward(m.module2.backward(x, eta), eta)
 
-proc `->`[A, B: Module64](a: A, b: B): auto =
+proc `->`[A; B](a: A, b: B): auto =
   Sequential[A, B](module1: a, module2: b)
 
 proc forward(m: QuadraticCost, x, y: DVector64): float64 = l_2(x - y)
@@ -79,6 +87,18 @@ proc forward(m: QuadraticCost, x, y: DVector64): float64 = l_2(x - y)
 proc backward(m: QuadraticCost, x, y: DVector64): DVector64 = 2 * (x - y)
 
 proc sigmoid(z: float64): float64 = 1.0 / (exp(-z) + 1.0)
+
+proc sigmoidPrime(z: float64): float64 = sigmoid(z) * (1.0 - sigmoid(z))
+
+makeUniversal(sigmoid)
+makeUniversal(sigmoidPrime)
+
+proc forward(m: var Sigmoid64, x: DVector64): DVector64 =
+  m.lastInput = x
+  return sigmoid(x)
+
+proc backward(m: var Sigmoid64, v: DVector64): DVector64 =
+  sigmoidPrime(m.lastInput) |*| v
 
 proc run(m: var Module64, c: Cost64, input, output: DVector64): Result64 =
   let
@@ -88,8 +108,6 @@ proc run(m: var Module64, c: Cost64, input, output: DVector64): Result64 =
     gradient = m.backward(firstGradient)
   return Result64(loss: loss, gradient: gradient)
 
-# proc sigmoid_prime(z: Matrix): Matrix =
-#   sigmoid(z) .* (1.0 - sigmoid(z))
 
 when isMainModule:
   let
@@ -98,15 +116,19 @@ when isMainModule:
     cost = QuadraticCost()
   var
     m1 = l1.withMemory
-    m2 = l2.withMemory
-    m3 = m1 -> m2
+    m2 = Sigmoid64()
+    m3 = l2.withMemory
+    m4 = m1 -> m3
+    # m5 = m3 -> m4
+    # m5 = m4 -> m3
   let
     v = randomVector(784).toDynamic
     w = randomVector(20).toDynamic
-  let result = run(m3, cost, v, w)
+  let result = run(m4, cost, v, w)
   echo result.gradient
   echo result.loss
   echo m1 is Module64
+  echo m2 is Module64
   echo l1 is Layer64
-  echo m3 is Module64
+  echo m2 is Module64
   echo cost is Cost64
