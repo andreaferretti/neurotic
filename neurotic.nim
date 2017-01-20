@@ -4,13 +4,6 @@ import random/urandom, random/mersenne
 import collections/iface
 
 type
-  # Module64 = concept m
-  #   # var x: DMatrix64
-  #   var y: DVector64
-  #   # m.forward(x) is DMatrix64
-  #   m.forward(y) is DVector64
-  #   # m.backward(x) is DMatrix64
-  #   m.backward(y) is DVector64
   Cost64 = concept m
     # var x: DMatrix64
     var y, t: DVector64
@@ -18,8 +11,6 @@ type
     m.forward(y, t) is float64
     # m.backward(x) is DMatrix64
     m.backward(y, t) is DVector64
-  Layer64 = concept x
-    x.withMemory is Module64
   IModule64 = distinct Interface
   Result64 = object
     loss: float64
