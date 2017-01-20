@@ -17,6 +17,8 @@ type
     m.forward(y) is float64
     # m.backward(x) is DMatrix64
     m.backward(y) is float64
+  Layer64 = concept x
+    x.withMemory is Module64
   Dense64 = object
     a, b: int
   Dense64Memory = object
@@ -25,6 +27,9 @@ type
   Dense64Module = object
     memory: Dense64Memory
     lastInput: DVector64
+  Sequential[A, B] = object
+    module1: A
+    module2: B
 
 var rng = initMersenneTwister(urandom(16))
 
@@ -43,8 +48,6 @@ proc withMemory(d: Dense64, m: Dense64Memory): Dense64Module =
 
 proc withMemory(d: Dense64): Dense64Module = d.withMemory(d.memory)
 
-# proc forward(m: Dense64Module, x: DMatrix64): DMatrix64 = (m.weights * x) +
-
 proc forward(m: var Dense64Module, x: DVector64): DVector64 =
   m.lastInput = x
   return (m.memory.weights * x) + m.memory.bias
@@ -58,13 +61,28 @@ proc backward(m: var Dense64Module, v: DVector64, eta = 0.01'f64): DVector64 =
   m.memory.bias -= eta * v
   m.memory.weights -= eta * gradWeights
 
+proc forward[A, B: Module64](m: var Sequential[A, B], x: DVector64): DVector64 =
+  m.module2.forward(m.module1.forward(x))
+
+proc backward[A, B: Module64](m: var Sequential[A, B], x: DVector64, eta = 0.01'f64): DVector64 =
+  m.module1.backward(m.module2.backward(x, eta), eta)
+
+proc `->`[A, B: Module64](a: A, b: B): auto =
+  Sequential[A, B](module1: a, module2: b)
+
 when isMainModule:
-  let l1 = dense(784, 30)
-  var m1 = l1.withMemory
+  let
+    l1 = dense(784, 30)
+    l2 = dense(30, 20)
+  var
+    m1 = l1.withMemory
+    m2 = l2.withMemory
+    m3 = m1 -> m2
   let v = randomVector(784).toDynamic
-  let output = m1.forward(v)
+  let output = m3.forward(v)
   echo output
-  echo(output .* output)
-  let x = m1.backward(output)
+  let x = m3.backward(output)
   echo x
   echo m1 is Module64
+  echo l1 is Layer64
+  echo m3 is Module64
