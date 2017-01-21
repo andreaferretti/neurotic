@@ -1,4 +1,5 @@
-import linalg
+import math
+import linalg, alea
 import random/urandom, random/mersenne
 import ./core, ./util
 
@@ -12,7 +13,8 @@ type
     memory*: Dense64Memory
     lastInput: DVector64
 
-var rng = initMersenneTwister(urandom(16))
+var rng = wrap(initMersenneTwister(urandom(16)))
+let g = gaussian(mu = 0, sigma = 1)
 
 proc dense64*(a, b: int): auto = Dense64(a: a, b: b)
 
@@ -20,8 +22,8 @@ proc dense*(a, b: int): auto = dense64(a, b)
 
 proc memory*(d: Dense64): Dense64Memory =
   Dense64Memory(
-    weights: makeMatrix(d.b, d.a, proc(i, j: int): float64 = rng.random()),
-    bias: makeVector(d.b, proc(i: int): float64 = rng.random())
+    weights: makeMatrix(d.b, d.a, proc(i, j: int): float64 = rng.sample(g) / sqrt(d.a.float)),
+    bias: makeVector(d.b, proc(i: int): float64 = rng.sample(g))
   )
 
 proc withMemory*(d: Dense64, m: Dense64Memory): Dense64Module =

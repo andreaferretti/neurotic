@@ -7,8 +7,8 @@ when isMainModule:
     cost = QuadraticCost()
   var
     m1 = l1.withMemory
-    # m2 = Sigmoid64()
-    m2 = reluModule()
+    m2 = sigmoidModule()
+    # m2 = reluModule()
     m3 = l2.withMemory
     m4 =(m1 -> m2) -> m3
   let
