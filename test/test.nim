@@ -15,6 +15,6 @@ when isMainModule:
     v = randomVector(784).toDynamic
     w = randomVector(20).toDynamic
 
-  let result = run(m4.asIModule64, cost, v, w)
+  let result = run(m4.asModule64, cost, v, w)
   echo result.gradient
   echo result.loss

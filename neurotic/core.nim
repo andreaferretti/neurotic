@@ -9,8 +9,8 @@ type
     m.forward(y, t) is float64
     # m.backward(x) is DMatrix64
     m.backward(y, t) is DVector64
-  IModule64* = distinct Interface
+  Module64* = distinct Interface
 
-interfaceMethods IModule64:
+interfaceMethods Module64:
   forward(v: DVector64): DVector64
   backward(v: DVector64, eta: float64): DVector64
