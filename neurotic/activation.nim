@@ -2,10 +2,10 @@ import linalg
 import ./util
 
 type
-  Sigmoid64* = ref object of RootObj
+  Activation* = ref object of RootObj
     lastInput: DVector64
-  Relu64* = ref object of RootObj
-    lastInput: DVector64
+    f: proc(x: DVector64): DVector64
+    fPrime: proc(x: DVector64): DVector64
 
 proc sigmoid*(z: float64): float64 = 1.0 / (exp(-z) + 1.0)
 
@@ -21,16 +21,13 @@ makeUniversal(sigmoidPrime)
 makeUniversal(relu)
 makeUniversal(reluPrime)
 
-proc forward*(m: Sigmoid64, x: DVector64): DVector64 =
-  m.lastInput = x
-  return sigmoid(x)
+proc forward*(a: Activation, x: DVector64): DVector64 =
+  a.lastInput = x
+  return a.f(x)
 
-proc backward*(m: Sigmoid64, v: DVector64, eta: float64): DVector64 =
-  sigmoidPrime(m.lastInput) |*| v
+proc backward*(a: Activation, v: DVector64, eta: float64): DVector64 =
+  a.fPrime(a.lastInput) |*| v
 
-proc forward*(m: Relu64, x: DVector64): DVector64 =
-  m.lastInput = x
-  return relu(x)
+proc sigmoidModule*(): Activation = Activation(f: sigmoid, fPrime: sigmoidPrime)
 
-proc backward*(m: Relu64, v: DVector64, eta: float64): DVector64 =
-  reluPrime(m.lastInput) |*| v
+proc reluModule*(): Activation = Activation(f: relu, fPrime: reluPrime)
