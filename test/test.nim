@@ -10,7 +10,8 @@ when isMainModule:
     m2 = sigmoidModule()
     # m2 = reluModule()
     m3 = l2.withMemory
-    m4 =(m1 -> m2) -> m3
+    # m4 = m1 -> m2 -> m3
+    m4 = sequential(m1, m2, m3)
   let
     v = randomVector(784).toDynamic
     w = randomVector(20).toDynamic
