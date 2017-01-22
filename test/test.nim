@@ -1,4 +1,4 @@
-import neurotic, linalg, neurotic/mnist
+import neurotic, linalg
 
 when isMainModule:
   let
