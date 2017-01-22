@@ -12,6 +12,7 @@ requires "nim >= 0.16.0", "random >= 0.5.3", "linalg >= 0.5.3",
 
 task run, "run example":
   --define:openblas
-  --run
+  --define:release
+  # --run
   --path:"."
   setCommand "c", "test/test.nim"
