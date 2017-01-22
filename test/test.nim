@@ -16,10 +16,7 @@ when isMainModule:
   #   v = randomVector(784).toDynamic
   #   w = randomVector(20).toDynamic
 
-  let data = mnistLoad(
-    "data/train-images.idx3-ubyte",
-    "data/train-labels.idx1-ubyte"
-  )
+  let data = mnistTrainData()
   for d in data:
     let (input, output) = d
     let result = run(m4, cost, input.asVector, output)

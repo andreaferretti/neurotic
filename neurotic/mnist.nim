@@ -35,7 +35,7 @@ proc loadLabelFile(labelFile: string, maxEntries = high(int)): seq[int] =
     result.add(cast[int](s.readChar()))
   s.close()
 
-proc mnist_load*(imgFile, labelFile: string, maxEntries = high(int)): auto =
+proc mnistLoad*(imgFile, labelFile: string, maxEntries = high(int)): auto =
   proc vectorize(i: int): DVector64 =
     let m = 10
     result = zeros(m)
@@ -45,3 +45,9 @@ proc mnist_load*(imgFile, labelFile: string, maxEntries = high(int)): auto =
   let labels = loadLabelFile(labelFile, maxEntries = maxEntries)
   assert(len(images) == len(labels))
   result = zip(images, labels.map(vectorize))
+
+proc mnistTrainData*(dataDir = "data", maxEntries = high(int)): auto =
+  mnistLoad(dataDir & "/train-images.idx3-ubyte", dataDir & "/train-labels.idx1-ubyte")
+
+proc mnistTestData*(dataDir = "data", maxEntries = high(int)): auto =
+  mnistLoad(dataDir & "/t10k-images.idx3-ubyte", dataDir & "/t10k-labels.idx1-ubyte")
