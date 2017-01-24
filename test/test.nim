@@ -17,7 +17,10 @@ when isMainModule:
   #   w = randomVector(20).toDynamic
 
   let data = mnistTrainData()
+  var count = 0
   for d in data:
     let (input, output) = d
     let result = run(m4, cost, input.asVector, output)
-    echo result.loss
+    if count mod 1000 == 0:
+      echo result.loss
+    count += 1
