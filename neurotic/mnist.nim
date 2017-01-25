@@ -1,4 +1,4 @@
-import streams, endians, sequtils
+import streams, endians, sequtils, os, httpclient
 import linalg
 
 proc readInt32BE(s: FileStream): int =
@@ -35,6 +35,31 @@ proc loadLabelFile(labelFile: string, maxEntries = high(int)): seq[int] =
     result.add(cast[int](s.readChar()))
   s.close()
 
+proc mnistDownload*(dataDir = "data") =
+  discard existsOrCreateDir(dataDir)
+  let
+    mnistUrl = "http://yann.lecun.com/exdb/mnist/"
+    files = [
+      ("t10k-images", "idx3-ubyte"),
+      ("t10k-labels", "idx1-ubyte"),
+      ("train-images", "idx3-ubyte"),
+      ("train-labels", "idx1-ubyte")
+    ]
+  for file in files:
+    let
+      (name, extension) = file
+      target = dataDir / (name & "." & extension)
+      path = name & "-" & extension & ".gz"
+      zipped = dataDir / path
+    if not existsFile(target):
+      if not existsFile(zipped):
+        echo "Downloading ", zipped, "..."
+        downloadFile(mnistUrl & path, zipped)
+      echo "Extracting ", zipped, "..."
+      let outcome = execShellCmd("gzip -d -N " & zipped)
+      if outcome != 0:
+        raise newException(OSError, "Failed to extract " & zipped)
+
 proc mnistLoad*(imgFile, labelFile: string, maxEntries = high(int)): auto =
   proc vectorize(i: int): DVector64 =
     let m = 10
@@ -47,7 +72,9 @@ proc mnistLoad*(imgFile, labelFile: string, maxEntries = high(int)): auto =
   result = zip(images, labels.map(vectorize))
 
 proc mnistTrainData*(dataDir = "data", maxEntries = high(int)): auto =
+  mnistDownload(dataDir)
   mnistLoad(dataDir & "/train-images.idx3-ubyte", dataDir & "/train-labels.idx1-ubyte")
 
 proc mnistTestData*(dataDir = "data", maxEntries = high(int)): auto =
+  mnistDownload(dataDir)
   mnistLoad(dataDir & "/t10k-images.idx3-ubyte", dataDir & "/t10k-labels.idx1-ubyte")
