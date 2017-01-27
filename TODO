@@ -1,10 +1,11 @@
+* separate gradint computation and update
+* choose whether to use iface or other interface implementations
 * batch forward and backward propagation
 * add training and testing functions
 * gradient descent
 * check that we actually learn on MNIST
 * model.add
 * clarify layer vs. model
-* choose whether to use iface or other interface implementations
 * more cost functions
 * more activation functions
 * more optimization methods http://sebastianruder.com/optimizing-gradient-descent/
@@ -16,3 +17,7 @@
 * save/load models
 * load from model zoo
 * layer visualization
+* convolutional networks
+* regularization
+* momentum
+* allow users to custom initialize layers
