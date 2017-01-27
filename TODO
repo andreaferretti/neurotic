@@ -7,7 +7,7 @@
 * choose whether to use iface or other interface implementations
 * more cost functions
 * more activation functions
-* more optimization methods
+* more optimization methods http://sebastianruder.com/optimizing-gradient-descent/
 * 32-bit layers
 * GPU layers
 * static dimension layers
