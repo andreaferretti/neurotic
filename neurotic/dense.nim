@@ -36,7 +36,7 @@ proc forward*(m: Dense64Module, x: DVector64): DVector64 =
   m.lastInput = x
   return (m.memory.weights * x) + m.memory.bias
 
-proc forward*(m: Dense64Module, x: DMatrix64): DMatrix64 =
+proc forwardM*(m: Dense64Module, x: DMatrix64): DMatrix64 =
   m.lastInputs = x
   let (_, n) = x.dim
   return (m.memory.weights * x) + repeat(m.memory.bias, n)

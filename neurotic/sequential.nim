@@ -8,6 +8,9 @@ type Sequential* = ref object of RootObj
 proc forward*(m: Sequential, x: DVector64): DVector64 =
   m.modules.foldl(b.forward(a), x)
 
+proc forwardM*(m: Sequential, x: DMatrix64): DMatrix64 =
+  m.modules.foldl(b.forwardM(a), x)
+
 proc backward*(m: Sequential, x: DVector64, eta: float64): DVector64 =
   result = x
   for i in countdown(m.modules.high, m.modules.low):

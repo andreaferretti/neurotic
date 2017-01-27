@@ -13,4 +13,5 @@ type
 
 interfaceMethods Module64:
   forward(v: DVector64): DVector64
+  forwardM(v: DMatrix64): DMatrix64
   backward(v: DVector64, eta: float64): DVector64
