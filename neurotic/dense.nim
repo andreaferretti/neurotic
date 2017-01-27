@@ -9,7 +9,7 @@ type
   Dense64Memory* = object
     weights*: DMatrix64
     bias*: DVector64
-  Dense64Module = ref object of RootObj
+  Dense64Module = ref object of Module64
     memory*: Dense64Memory
     lastInput: DVector64
     lastInputs: DMatrix64
@@ -32,16 +32,16 @@ proc withMemory*(d: Dense64, m: Dense64Memory): Dense64Module =
 
 proc withMemory*(d: Dense64): Dense64Module = d.withMemory(d.memory)
 
-proc forward*(m: Dense64Module, x: DVector64): DVector64 =
+method forward*(m: Dense64Module, x: DVector64): DVector64 =
   m.lastInput = x
   return (m.memory.weights * x) + m.memory.bias
 
-proc forwardM*(m: Dense64Module, x: DMatrix64): DMatrix64 =
+method forward*(m: Dense64Module, x: DMatrix64): DMatrix64 =
   m.lastInputs = x
   let (_, n) = x.dim
   return (m.memory.weights * x) + repeat(m.memory.bias, n)
 
-proc backward*(m: Dense64Module, v: DVector64, eta: float64): DVector64 =
+method backward*(m: Dense64Module, v: DVector64, eta: float64): DVector64 =
   result = m.memory.weights.t * v
   let gradWeights = v .* m.lastInput
   m.memory.bias -= eta * v

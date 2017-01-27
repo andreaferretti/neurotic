@@ -1,8 +1,8 @@
 import linalg
-import ./util
+import ./core, ./util
 
 type
-  Activation* = ref object of RootObj
+  Activation* = ref object of Module64
     lastInput: DVector64
     lastInputs: DMatrix64
     f: proc(x: DVector64): DVector64
@@ -24,15 +24,15 @@ makeUniversal(sigmoidPrime)
 makeUniversal(relu)
 makeUniversal(reluPrime)
 
-proc forward*(a: Activation, x: DVector64): DVector64 =
+method forward*(a: Activation, x: DVector64): DVector64 =
   a.lastInput = x
   return a.f(x)
 
-proc forwardM*(a: Activation, x: DMatrix64): DMatrix64 =
+method forward*(a: Activation, x: DMatrix64): DMatrix64 =
   a.lastInputs = x
   return a.fm(x)
 
-proc backward*(a: Activation, v: DVector64, eta: float64): DVector64 =
+method backward*(a: Activation, v: DVector64, eta: float64): DVector64 =
   a.fPrime(a.lastInput) |*| v
 
 proc sigmoidModule*(): Activation = Activation(

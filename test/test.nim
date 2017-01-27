@@ -16,7 +16,7 @@ proc main() =
     # m2 = sigmoidModule()
     m2 = reluModule()
     m3 = l2.withMemory
-    m4 = sequential(m1, m2, m3).asModule64
+    m4 = sequential(@[m1, m2, m3])
 
   let data = mnistTrainData()
   var count = 0
