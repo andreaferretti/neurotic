@@ -2,6 +2,8 @@
 * add training and testing functions
 * gradient descent
 * check that we actually learn on MNIST
+* model.add
+* clarify layer vs. model
 * choose whether to use iface or other interface implementations
 * more cost functions
 * more activation functions
