@@ -1,5 +1,4 @@
 * separate gradint computation and update
-* choose whether to use iface or other interface implementations
 * batch forward and backward propagation
 * add training and testing functions
 * gradient descent
@@ -21,3 +20,4 @@
 * regularization
 * momentum
 * allow users to custom initialize layers
+* choose whether to use iface or other interface implementations
