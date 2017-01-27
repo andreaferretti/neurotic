@@ -11,6 +11,13 @@ proc `|*|`*(a, b: DVector64): DVector64 =
   for i in 0 .. < a.len:
     result[i] = a[i] * b[i]
 
+proc averageCol*(m: DMatrix64): DVector64 =
+  let (a, b) = m.dim
+  result = zeros(a)
+  for col in columns(m):
+    result += col
+  result /= b.float64
+
 proc repeat*(a: DVector64, n: int): DMatrix64 =
   makeMatrix(a.len, n, proc(i, j: int): float64 = a[i])
 

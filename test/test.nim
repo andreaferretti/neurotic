@@ -6,6 +6,11 @@ proc adjustTest(x: tuple[a: DMatrix64, b: DVector64]): (DVector64, int) =
   let (i, _) = maxIndex(v)
   (m.asVector, i)
 
+proc adjustTrain(x: tuple[a: DMatrix64, b: DVector64]): TrainingData64 =
+  let (m, v) = x
+  (input: m.asVector, output: v)
+
+
 proc main() =
   let
     l1 = dense(784, 50)
@@ -18,8 +23,6 @@ proc main() =
     m3 = l2.withMemory
     m4 = sequential(@[m1, m2, m3])
 
-  let data = mnistTrainData()
-  var count = 0
   # let (x, _) = data[0]
   # let (y, _) = data[1]
   # let z = batch(x.asVector, y.asVector)
@@ -27,12 +30,8 @@ proc main() =
   # let a2 = m1.forward(x.asVector)
   # let a3 = m1.forward(y.asVector)
   # echo a1 =~ batch(a2, a3)
-  for d in data:
-    let (input, output) = d
-    let result = run(m4, cost, input.asVector, output)
-    if count mod 1000 == 0:
-      echo result.loss
-    count += 1
+  let data = mnistTrainData().map(adjustTrain)
+  sgd(m4, cost, data)
 
   let testData = mnistTestData().map(adjustTest)
   let rightAnswers = m4.evaluate(testData)
