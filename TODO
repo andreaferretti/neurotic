@@ -1,0 +1,16 @@
+* batch forward and backward propagation
+* add training and testing functions
+* gradient descent
+* check that we actually learn on MNIST
+* choose whether to use iface or other interface implementations
+* more cost functions
+* more activation functions
+* more optimization methods
+* 32-bit layers
+* GPU layers
+* static dimension layers
+* weight sharing and RNN
+* replicate standard examples
+* save/load models
+* load from model zoo
+* layer visualization
