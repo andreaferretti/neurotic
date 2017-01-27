@@ -7,8 +7,8 @@ type
   Dense64* = object
     a, b: int
   Dense64Memory* = object
-    weights*: DMatrix64
-    bias*: DVector64
+    weights*, gradWeights*: DMatrix64
+    bias*, gradBias*: DVector64
   Dense64Module = ref object of Module64
     memory*: Dense64Memory
     lastInput: DVector64
@@ -43,6 +43,7 @@ method forward*(m: Dense64Module, x: DMatrix64): DMatrix64 =
 
 method backward*(m: Dense64Module, v: DVector64, eta: float64): DVector64 =
   result = m.memory.weights.t * v
-  let gradWeights = v .* m.lastInput
-  m.memory.bias -= eta * v
-  m.memory.weights -= eta * gradWeights
+  m.memory.gradBias = v
+  m.memory.gradWeights = v .* m.lastInput
+  m.memory.bias -= eta * m.memory.gradBias
+  m.memory.weights -= eta * m.memory.gradWeights

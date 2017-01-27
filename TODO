@@ -9,6 +9,7 @@
 * more cost functions
 * more activation functions
 * more optimization methods http://sebastianruder.com/optimizing-gradient-descent/
+* more connectors (side by side etc)
 * 32-bit layers
 * GPU layers
 * static dimension layers
