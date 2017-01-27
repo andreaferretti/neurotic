@@ -50,8 +50,9 @@ method backward*(m: Dense64Module, v: DVector64, eta: float64): DVector64 =
 
 method backward*(m: Dense64Module, v: DMatrix64, eta: float64): DMatrix64 =
   result = m.memory.weights.t * v
-  let w = averageCol(v)
-  m.memory.gradBias = w
-  m.memory.gradWeights = w .* m.lastInput
-  m.memory.bias -= eta * m.memory.gradBias
-  m.memory.weights -= eta * m.memory.gradWeights
+  let (_, n) = v.dim
+  let k = n.float64
+  m.memory.gradBias = sumColumns(v) / k
+  m.memory.gradWeights = v * m.lastInputs.t / k
+  m.memory.bias -= k * eta * m.memory.gradBias
+  m.memory.weights -= k * eta * m.memory.gradWeights

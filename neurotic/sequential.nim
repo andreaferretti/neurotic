@@ -16,6 +16,11 @@ method backward*(m: Sequential, x: DVector64, eta: float64): DVector64 =
   for i in countdown(m.modules.high, m.modules.low):
     result = m.modules[i].backward(result, eta)
 
+method backward*(m: Sequential, x: DMatrix64, eta: float64): DMatrix64 =
+  result = x
+  for i in countdown(m.modules.high, m.modules.low):
+    result = m.modules[i].backward(result, eta)
+
 proc `->`*(a, b: Module64): Sequential =
   Sequential(modules: @[a, b])
 

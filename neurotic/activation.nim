@@ -35,6 +35,9 @@ method forward*(a: Activation, x: DMatrix64): DMatrix64 =
 method backward*(a: Activation, v: DVector64, eta: float64): DVector64 =
   a.fPrime(a.lastInput) |*| v
 
+method backward*(a: Activation, v: DMatrix64, eta: float64): DMatrix64 =
+  a.fmPrime(a.lastInputs) |*| v
+
 proc sigmoidModule*(): Activation = Activation(
   f: sigmoid,
   fm: sigmoid,
