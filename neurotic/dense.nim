@@ -12,6 +12,7 @@ type
   Dense64Module = ref object of RootObj
     memory*: Dense64Memory
     lastInput: DVector64
+    lastInputs: DMatrix64
 
 var rng = wrap(initMersenneTwister(urandom(16)))
 let g = gaussian(mu = 0, sigma = 1)
@@ -34,6 +35,11 @@ proc withMemory*(d: Dense64): Dense64Module = d.withMemory(d.memory)
 proc forward*(m: Dense64Module, x: DVector64): DVector64 =
   m.lastInput = x
   return (m.memory.weights * x) + m.memory.bias
+
+proc forward*(m: Dense64Module, x: DMatrix64): DMatrix64 =
+  m.lastInputs = x
+  let (_, n) = x.dim
+  return (m.memory.weights * x) + repeat(m.memory.bias, n)
 
 proc backward*(m: Dense64Module, v: DVector64, eta: float64): DVector64 =
   result = m.memory.weights.t * v
