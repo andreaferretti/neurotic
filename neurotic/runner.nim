@@ -37,8 +37,15 @@ proc batch*(data: seq[TrainingData64], start, size: int): tuple[input, output: D
   let
     inputSize = data[0].input.len
     outputSize = data[0].output.len
-    input = makeMatrix(inputSize, size, proc(i, j: int): float64 = data[start + j].input[i])
-    output = makeMatrix(outputSize, size, proc(i, j: int): float64 = data[start + j].output[i])
+  var
+    input = zeros(inputSize, size) #, proc(i, j: int): float64 = data[start + j].input[i])
+    output = zeros(outputSize, size) #, proc(i, j: int): float64 = data[start + j].output[i])
+  for i in 0 ..< size:
+    let d = data[start + i]
+    for j in 0 ..< inputSize:
+      input[j, i] = d.input[j]
+    for j in 0 ..< outputSize:
+      output[j, i] = d.output[j]
   return (input, output)
 
 proc miniBatchSgd*(m: Module64, c: Cost64, data: seq[TrainingData64], batchSize = 100, eta = 0.01'f64) =
