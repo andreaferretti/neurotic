@@ -32,7 +32,8 @@ proc main() =
   # echo a1 =~ batch(a2, a3)
   let data = mnistTrainData().map(adjustTrain)
   # sgd(m4, cost, data)
-  miniBatchSgd(m4, cost, data)
+  for _ in 1 .. 10:
+    miniBatchSgd(m4, cost, data)
 
   let testData = mnistTestData().map(adjustTest)
   let rightAnswers = m4.evaluate(testData)

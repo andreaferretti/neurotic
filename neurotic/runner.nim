@@ -38,8 +38,8 @@ proc batch*(data: seq[TrainingData64], start, size: int): tuple[input, output: D
     inputSize = data[0].input.len
     outputSize = data[0].output.len
   var
-    input = zeros(inputSize, size) #, proc(i, j: int): float64 = data[start + j].input[i])
-    output = zeros(outputSize, size) #, proc(i, j: int): float64 = data[start + j].output[i])
+    input = zeros(inputSize, size)
+    output = zeros(outputSize, size)
   for i in 0 ..< size:
     let d = data[start + i]
     for j in 0 ..< inputSize:
@@ -49,11 +49,13 @@ proc batch*(data: seq[TrainingData64], start, size: int): tuple[input, output: D
   return (input, output)
 
 proc miniBatchSgd*(m: Module64, c: Cost64, data: seq[TrainingData64], batchSize = 100, eta = 0.01'f64) =
-  var count = 0
+  var
+    count = 0
+    loss = 0.0
   while count < data.len:
     let
       (input, output) = data.batch(count, batchSize)
       res = run(m, c, input, output, eta)
-    if count mod 1000 == 0:
-      echo res.loss
+    loss += res.loss
     count += batchSize
+  echo "loss: ", (loss / count.float)
