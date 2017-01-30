@@ -24,14 +24,16 @@ proc run*(m: Module64, c: Cost64, input, output: DMatrix64, eta = 0.01'f64): Res
   return Result64(loss: loss)
 
 proc sgd*(m: Module64, c: Cost64, data: seq[TrainingData64], eta = 0.01'f64) =
-  var count = 0
+  var
+    count = 0
+    loss = 0.0
   for d in data:
     let
       (input, output) = d
       res = run(m, c, input, output, eta)
-    if count mod 1000 == 0:
-      echo res.loss
+    loss += res.loss
     count += 1
+  echo "loss: ", (loss / count.float)
 
 proc batch*(data: seq[TrainingData64], start, size: int): tuple[input, output: DMatrix64] =
   let
