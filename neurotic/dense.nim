@@ -44,7 +44,7 @@ method forward*(m: Dense64Module, x: DMatrix64): DMatrix64 =
 method backward*(m: Dense64Module, v: DVector64, eta: float64): DVector64 =
   result = m.memory.weights.t * v
   m.memory.gradBias = v
-  m.memory.gradWeights = v .* m.lastInput
+  m.memory.gradWeights = v.asMatrix(v.len, 1) * m.lastInput.asMatrix(1, m.lastInput.len)#  v .* m.lastInput
   m.memory.bias -= eta * m.memory.gradBias
   m.memory.weights -= eta * m.memory.gradWeights
 
