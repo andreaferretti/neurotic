@@ -2,7 +2,7 @@ import linalg
 import ./core, ./util
 
 type
-  Activation* = ref object of Layer64
+  Activation64* = ref object of Layer64
     lastInput: DVector64
     lastInputs: DMatrix64
     f: proc(x: DVector64): DVector64
@@ -24,28 +24,28 @@ makeUniversal(sigmoidPrime)
 makeUniversal(relu)
 makeUniversal(reluPrime)
 
-method forward*(a: Activation, x: DVector64): DVector64 =
+method forward*(a: Activation64, x: DVector64): DVector64 =
   a.lastInput = x
   return a.f(x)
 
-method forward*(a: Activation, x: DMatrix64): DMatrix64 =
+method forward*(a: Activation64, x: DMatrix64): DMatrix64 =
   a.lastInputs = x
   return a.fm(x)
 
-method backward*(a: Activation, v: DVector64, eta: float64): DVector64 =
+method backward*(a: Activation64, v: DVector64, eta: float64): DVector64 =
   a.fPrime(a.lastInput) |*| v
 
-method backward*(a: Activation, v: DMatrix64, eta: float64): DMatrix64 =
+method backward*(a: Activation64, v: DMatrix64, eta: float64): DMatrix64 =
   a.fmPrime(a.lastInputs) |*| v
 
-proc sigmoidModule*(): Activation = Activation(
+proc sigmoidModule*(): Activation64 = Activation64(
   f: sigmoid,
   fm: sigmoid,
   fPrime: sigmoidPrime,
   fmPrime: sigmoidPrime
 )
 
-proc reluModule*(): Activation = Activation(
+proc reluModule*(): Activation64 = Activation64(
   f: relu,
   fm: relu,
   fPrime: reluPrime,
