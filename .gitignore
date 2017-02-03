@@ -1,4 +1,4 @@
 nimcache
-/test/test
+/examples/mnist
 /data
 nimsuggest.log

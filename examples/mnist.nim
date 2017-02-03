@@ -23,15 +23,8 @@ proc main() =
     m3 = l2.withMemory
     m4 = sequential(@[m1, m2, m3])
 
-  # let (x, _) = data[0]
-  # let (y, _) = data[1]
-  # let z = batch(x.asVector, y.asVector)
-  # let a1 = m1.forward(z)
-  # let a2 = m1.forward(x.asVector)
-  # let a3 = m1.forward(y.asVector)
-  # echo a1 =~ batch(a2, a3)
   let data = mnistTrainData().map(adjustTrain)
-  for _ in 1 .. 100:
+  for _ in 1 .. 10:
     # sgd(m4, cost, data)
     miniBatchSgd(m4, cost, data)
 
