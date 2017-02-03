@@ -1,9 +1,7 @@
 * separate gradint computation and update
-* batch forward and backward propagation
 * add training and testing functions
 * add a function to gather statistics
 * gradient descent
-* check that we actually learn on MNIST
 * model.add
 * clarify layer vs. model
 * more cost functions
@@ -23,4 +21,3 @@
 * momentum
 * add a function to export the neuron graph, say in dot
 * allow users to custom initialize layers
-* choose whether to use iface or other interface implementations
