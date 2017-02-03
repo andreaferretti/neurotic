@@ -2,7 +2,7 @@ import linalg
 import ./core, ./util
 
 type
-  Activation* = ref object of Module64
+  Activation* = ref object of Layer64
     lastInput: DVector64
     lastInputs: DMatrix64
     f: proc(x: DVector64): DVector64

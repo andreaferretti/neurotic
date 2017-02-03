@@ -9,7 +9,7 @@ type
   Dense64Memory* = object
     weights*, gradWeights*: DMatrix64
     bias*, gradBias*: DVector64
-  Dense64Module = ref object of Module64
+  Dense64Layer = ref object of Layer64
     memory*: Dense64Memory
     lastInput: DVector64
     lastInputs: DMatrix64
@@ -27,28 +27,28 @@ proc memory*(d: Dense64): Dense64Memory =
     bias: makeVector(d.b, proc(i: int): float64 = rng.sample(g))
   )
 
-proc withMemory*(d: Dense64, m: Dense64Memory): Dense64Module =
-  Dense64Module(memory: m)
+proc withMemory*(d: Dense64, m: Dense64Memory): Dense64Layer =
+  Dense64Layer(memory: m)
 
-proc withMemory*(d: Dense64): Dense64Module = d.withMemory(d.memory)
+proc withMemory*(d: Dense64): Dense64Layer = d.withMemory(d.memory)
 
-method forward*(m: Dense64Module, x: DVector64): DVector64 =
+method forward*(m: Dense64Layer, x: DVector64): DVector64 =
   m.lastInput = x
   return (m.memory.weights * x) + m.memory.bias
 
-method forward*(m: Dense64Module, x: DMatrix64): DMatrix64 =
+method forward*(m: Dense64Layer, x: DMatrix64): DMatrix64 =
   m.lastInputs = x
   let (_, n) = x.dim
   return (m.memory.weights * x) + repeat(m.memory.bias, n)
 
-method backward*(m: Dense64Module, v: DVector64, eta: float64): DVector64 =
+method backward*(m: Dense64Layer, v: DVector64, eta: float64): DVector64 =
   result = m.memory.weights.t * v
   m.memory.gradBias = v
   m.memory.gradWeights = v.asMatrix(v.len, 1) * m.lastInput.asMatrix(1, m.lastInput.len)#  v .* m.lastInput
   m.memory.bias -= eta * m.memory.gradBias
   m.memory.weights -= eta * m.memory.gradWeights
 
-method backward*(m: Dense64Module, v: DMatrix64, eta: float64): DMatrix64 =
+method backward*(m: Dense64Layer, v: DMatrix64, eta: float64): DMatrix64 =
   result = m.memory.weights.t * v
   let (_, n) = v.dim
   let k = n.float64

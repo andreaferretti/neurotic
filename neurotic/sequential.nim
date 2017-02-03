@@ -2,27 +2,27 @@ import sequtils, macros
 import linalg
 import ./core
 
-type Sequential* = ref object of Module64
-  modules: seq[Module64]
+type Sequential64* = ref object of Layer64
+  modules: seq[Layer64]
 
-method forward*(m: Sequential, x: DVector64): DVector64 =
+method forward*(m: Sequential64, x: DVector64): DVector64 =
   m.modules.foldl(b.forward(a), x)
 
-method forward*(m: Sequential, x: DMatrix64): DMatrix64 =
+method forward*(m: Sequential64, x: DMatrix64): DMatrix64 =
   m.modules.foldl(b.forward(a), x)
 
-method backward*(m: Sequential, x: DVector64, eta: float64): DVector64 =
+method backward*(m: Sequential64, x: DVector64, eta: float64): DVector64 =
   result = x
   for i in countdown(m.modules.high, m.modules.low):
     result = m.modules[i].backward(result, eta)
 
-method backward*(m: Sequential, x: DMatrix64, eta: float64): DMatrix64 =
+method backward*(m: Sequential64, x: DMatrix64, eta: float64): DMatrix64 =
   result = x
   for i in countdown(m.modules.high, m.modules.low):
     result = m.modules[i].backward(result, eta)
 
-proc `->`*(a, b: Module64): Sequential =
-  Sequential(modules: @[a, b])
+proc `->`*(a, b: Layer64): Sequential64 =
+  Sequential64(modules: @[a, b])
 
-proc sequential*(modules: seq[Module64]): Sequential =
-  Sequential(modules: @modules)
+proc sequential*(modules: seq[Layer64]): Sequential64 =
+  Sequential64(modules: @modules)

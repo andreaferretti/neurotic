@@ -7,7 +7,7 @@ type
   TrainingData64* = tuple
     input, output: DVector64
 
-proc run*(m: Module64, c: Cost64, input, output: DVector64, eta = 0.01'f64): Result64 =
+proc run*(m: Layer64, c: Cost64, input, output: DVector64, eta = 0.01'f64): Result64 =
   let
     prediction = m.forward(input)
     loss = c.forward(prediction, output)
@@ -15,7 +15,7 @@ proc run*(m: Module64, c: Cost64, input, output: DVector64, eta = 0.01'f64): Res
     gradient = m.backward(firstGradient, eta)
   return Result64(loss: loss)
 
-proc run*(m: Module64, c: Cost64, input, output: DMatrix64, eta = 0.01'f64): Result64 =
+proc run*(m: Layer64, c: Cost64, input, output: DMatrix64, eta = 0.01'f64): Result64 =
   let
     prediction = m.forward(input)
     loss = c.forward(prediction, output)
@@ -23,7 +23,7 @@ proc run*(m: Module64, c: Cost64, input, output: DMatrix64, eta = 0.01'f64): Res
     gradient = m.backward(firstGradient, eta)
   return Result64(loss: loss)
 
-proc sgd*(m: Module64, c: Cost64, data: seq[TrainingData64], eta = 0.01'f64) =
+proc sgd*(m: Layer64, c: Cost64, data: seq[TrainingData64], eta = 0.01'f64) =
   var
     count = 0
     loss = 0.0
@@ -50,7 +50,7 @@ proc batch*(data: seq[TrainingData64], start, size: int): tuple[input, output: D
       output[j, i] = d.output[j]
   return (input, output)
 
-proc miniBatchSgd*(m: Module64, c: Cost64, data: seq[TrainingData64], batchSize = 100, eta = 0.01'f64) =
+proc miniBatchSgd*(m: Layer64, c: Cost64, data: seq[TrainingData64], batchSize = 100, eta = 0.01'f64) =
   var
     count = 0
     loss = 0.0

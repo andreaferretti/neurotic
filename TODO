@@ -3,7 +3,6 @@
 * add a function to gather statistics
 * gradient descent
 * model.add
-* clarify layer vs. model
 * more cost functions
 * more activation functions
 * more optimization methods http://sebastianruder.com/optimizing-gradient-descent/
