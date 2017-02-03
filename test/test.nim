@@ -31,7 +31,7 @@ proc main() =
   # let a3 = m1.forward(y.asVector)
   # echo a1 =~ batch(a2, a3)
   let data = mnistTrainData().map(adjustTrain)
-  for _ in 1 .. 10:
+  for _ in 1 .. 100:
     # sgd(m4, cost, data)
     miniBatchSgd(m4, cost, data)
 
