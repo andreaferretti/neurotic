@@ -7,10 +7,10 @@ license       = "Apache2"
 
 # Dependencies
 
-requires "nim >= 0.16.0", "random >= 0.5.3", "linalg >= 0.5.3",
+requires "nim >= 0.16.0", "random >= 0.5.3", "linalg >= 0.6.0",
   "alea >= 0.1.1"
 
-task run, "run example":
+task example, "run example":
   --define:openblas
   --define:release
   # --run
