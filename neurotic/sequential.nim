@@ -12,10 +12,16 @@ proc add*(m: var Sequential32, layer: Layer32) = m.modules.add(layer)
 
 proc add*(m: var Sequential64, layer: Layer64) = m.modules.add(layer)
 
-method forward*(m: Sequential32, x: DVector32 or DMatrix32): auto =
+method forward*(m: Sequential32, x: DVector32): auto =
   m.modules.foldl(b.forward(a), x)
 
-method forward*(m: Sequential64, x: DVector64 or DMatrix64): auto =
+method forward*(m: Sequential32, x: DMatrix32): auto =
+  m.modules.foldl(b.forward(a), x)
+
+method forward*(m: Sequential64, x: DVector64): auto =
+  m.modules.foldl(b.forward(a), x)
+
+method forward*(m: Sequential64, x: DMatrix64): auto =
   m.modules.foldl(b.forward(a), x)
 
 template backwardT(m, x, eta, result: untyped) =

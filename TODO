@@ -6,8 +6,8 @@
 * more activation functions
 * more optimization methods http://sebastianruder.com/optimizing-gradient-descent/
 * more connectors (side by side etc)
-* 32-bit layers
 * GPU layers
+* nicer API
 * static dimension layers
 * weight sharing and RNN
 * replicate standard examples

@@ -1,4 +1,5 @@
 nimcache
 /examples/mnist
+/examples/mnist32
 /data
 nimsuggest.log
