@@ -2,7 +2,6 @@
 * add training and testing functions
 * add a function to gather statistics
 * gradient descent
-* model.add
 * more cost functions
 * more activation functions
 * more optimization methods http://sebastianruder.com/optimizing-gradient-descent/

@@ -5,6 +5,9 @@ import ./core
 type Sequential64* = ref object of Layer64
   modules: seq[Layer64]
 
+proc add*(m: var Sequential64, layer: Layer64) =
+  m.modules.add(layer)
+
 method forward*(m: Sequential64, x: DVector64): DVector64 =
   m.modules.foldl(b.forward(a), x)
 
