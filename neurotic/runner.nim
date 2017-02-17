@@ -49,22 +49,22 @@ proc sgd*(m: Layer32, c: Cost32, data: seq[TrainingData32], eta = 0.01'f32) =
 proc sgd*(m: Layer64, c: Cost64, data: seq[TrainingData64], eta = 0.01'f64) =
   sgdT(m, c, data, eta)
 
-proc batch*(data: seq[TrainingData64], start, size: int): tuple[input, output: DMatrix64] =
+template batchT(data, start, size, result: untyped) =
   let
     inputSize = data[0].input.len
     outputSize = data[0].output.len
-  var
-    input = zeros(inputSize, size)
-    output = zeros(outputSize, size)
-  for i in 0 ..< size:
-    let d = data[start + i]
-    for j in 0 ..< inputSize:
-      input[j, i] = d.input[j]
-    for j in 0 ..< outputSize:
-      output[j, i] = d.output[j]
-  return (input, output)
+  block:
+    result.input = makeMatrixIJD(inputSize, size, data[start + j].input[i])
+  block:
+    result.output = makeMatrixIJD(outputSize, size, data[start + j].output[i])
 
-proc miniBatchSgd*(m: Layer64, c: Cost64, data: seq[TrainingData64], batchSize = 100, eta = 0.01'f64) =
+proc batch*(data: seq[TrainingData32], start, size: int): tuple[input, output: DMatrix32] =
+  batchT(data, start, size, result)
+
+proc batch*(data: seq[TrainingData64], start, size: int): tuple[input, output: DMatrix64] =
+  batchT(data, start, size, result)
+
+template miniBatchSgdT(m, c, data, batchSize, eta: untyped) =
   var
     count = 0
     loss = 0.0
@@ -75,3 +75,9 @@ proc miniBatchSgd*(m: Layer64, c: Cost64, data: seq[TrainingData64], batchSize =
     loss += res.loss
     count += batchSize
   echo "loss: ", (loss / count.float)
+
+proc miniBatchSgd*(m: Layer32, c: Cost32, data: seq[TrainingData32], batchSize = 100, eta = 0.01'f32) =
+  miniBatchSgdT(m, c, data, batchSize, eta)
+
+proc miniBatchSgd*(m: Layer64, c: Cost64, data: seq[TrainingData64], batchSize = 100, eta = 0.01'f64) =
+  miniBatchSgdT(m, c, data, batchSize, eta)
