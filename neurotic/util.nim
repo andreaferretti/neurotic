@@ -11,3 +11,7 @@ proc sumColumns*(m: DMatrix32 or DMatrix64): auto =
 
 proc repeat*(a: DVector32 or DVector64, n: int): auto =
   makeMatrix(a.len, n, proc(i, j: int): auto = a[i])
+
+proc oneHot*(i, size: int): DVector64 =
+  result = zeros(size)
+  result[i] = 1.0

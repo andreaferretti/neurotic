@@ -61,15 +61,10 @@ proc mnistDownload*(dataDir = "data") =
         raise newException(OSError, "Failed to extract " & zipped)
 
 proc mnistLoad*(imgFile, labelFile: string, maxEntries = high(int)): auto =
-  proc vectorize(i: int): DVector64 =
-    let m = 10
-    result = zeros(m)
-    result[i] = 1.0
-
   let images = loadImgFile(imgFile, maxEntries = maxEntries)
   let labels = loadLabelFile(labelFile, maxEntries = maxEntries)
   assert(len(images) == len(labels))
-  result = zip(images, labels.map(vectorize))
+  result = zip(images, labels)
 
 proc mnistTrainData*(dataDir = "data", maxEntries = high(int)): auto =
   mnistDownload(dataDir)

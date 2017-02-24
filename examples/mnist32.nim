@@ -1,14 +1,13 @@
 import sequtils
 import neurotic, linalg
 
-proc adjustTest(x: tuple[a: DMatrix64, b: DVector64]): (DVector32, int) =
-  let (m, v) = x
-  let (i, _) = maxIndex(v)
+proc adjustTest(x: (DMatrix64, int)): (DVector32, int) =
+  let (m, i) = x
   (m.asVector.to32, i)
 
-proc adjustTrain(x: tuple[a: DMatrix64, b: DVector64]): TrainingData32 =
-  let (m, v) = x
-  (input: m.asVector.to32, output: v.to32)
+proc adjustTrain(x: (DMatrix64, int)): TrainingData32 =
+  let (m, label) = x
+  (input: m.asVector.to32, output: oneHot(label, 10).to32)
 
 
 proc main() =
