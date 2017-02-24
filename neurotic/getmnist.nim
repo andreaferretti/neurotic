@@ -18,9 +18,9 @@ proc loadImgFile(imgFile: string, maxEntries = high(int)): seq[DMatrix64] =
   result = @[]
   for n in 0 ..< min(numImages, maxEntries):
     var img = zeros(rows, columns)
-    for i in 0..<rows:
-      for j in 0..<columns:
-        img[i, j] = toFloat(cast[int](s.readChar())) / 255.0
+    for i in 0..<columns:
+      for j in 0..<rows:
+        img[j, i] = toFloat(cast[int](s.readChar())) / 255.0
     result.add(img)
   s.close()
 

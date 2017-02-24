@@ -1,5 +1,5 @@
 import sequtils
-import neurotic, linalg
+import neurotic, linalg, nimPNG
 
 proc adjustTest(x: (DMatrix64, int)): (DVector64, int) =
   let (m, i) = x
@@ -23,6 +23,10 @@ proc main() =
     m4 = sequential(@[m1, m2, m3])
 
   let data = mnistTrainData().map(adjustTrain)
+  for j in 0 .. 10:
+    let (foo, _) = data[j]
+    echo savePNG(foo.asMatrix(28, 28), "foo" & $j & ".png")
+
   for _ in 1 .. 10:
     # sgd(m4, cost, data)
     miniBatchSgd(m4, cost, data)
