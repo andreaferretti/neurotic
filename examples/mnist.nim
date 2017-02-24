@@ -24,8 +24,8 @@ proc main() =
 
   let data = mnistTrainData().map(adjustTrain)
   for j in 0 .. 10:
-    let (foo, _) = data[j]
-    echo savePNG(foo.asMatrix(28, 28), "foo" & $j & ".png")
+    let (x, _) = data[j]
+    discard savePNG(x.asMatrix(28, 28), "mnist-" & $j & ".png")
 
   for _ in 1 .. 10:
     # sgd(m4, cost, data)
