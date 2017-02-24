@@ -34,14 +34,14 @@ proc dense*(a, b: int): auto = dense64(a, b)
 
 proc memory*(d: Dense32): Dense32Memory =
   Dense32Memory(
-    weights: makeMatrix(d.b, d.a, proc(i, j: int): float32 = rng.sample(g) / sqrt(d.a.float32)),
-    bias: makeVector(d.b, proc(i: int): float32 = rng.sample(g))
+    weights: makeMatrixIJD(d.b, d.a, rng.sample(g).float32 / sqrt(d.a.float32)),
+    bias: makeVectorID(d.b, rng.sample(g).float32)
   )
 
 proc memory*(d: Dense64): Dense64Memory =
   Dense64Memory(
-    weights: makeMatrix(d.b, d.a, proc(i, j: int): float64 = rng.sample(g) / sqrt(d.a.float)),
-    bias: makeVector(d.b, proc(i: int): float64 = rng.sample(g))
+    weights: makeMatrixIJD(d.b, d.a, rng.sample(g) / sqrt(d.a.float64)),
+    bias: makeVectorID(d.b, rng.sample(g).float64)
   )
 
 proc withMemory*(d: Dense32, m: Dense32Memory): Dense32Layer =
