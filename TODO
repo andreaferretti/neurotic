@@ -1,7 +1,6 @@
-* separate gradint computation and update
+* separate gradient computation and update
 * add training and testing functions
 * add a function to gather statistics
-* gradient descent
 * more cost functions
 * more activation functions
 * more optimization methods http://sebastianruder.com/optimizing-gradient-descent/
@@ -17,5 +16,6 @@
 * convolutional networks
 * regularization
 * momentum
+* dropout
 * add a function to export the neuron graph, say in dot
 * allow users to custom initialize layers
