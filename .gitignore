@@ -3,3 +3,4 @@ nimcache
 /examples/mnist32
 /data
 nimsuggest.log
+*.png
