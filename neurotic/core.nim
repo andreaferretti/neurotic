@@ -32,6 +32,18 @@ type
   Layer32* = ref object of RootObj
   Layer64* = ref object of RootObj
 
+method inputSize*(m: Layer32): int {.base.} =
+  quit "to override!"
+
+method inputSize*(m: Layer64): int {.base.} =
+  quit "to override!"
+
+method outputSize*(m: Layer32): int {.base.} =
+  quit "to override!"
+
+method outputSize*(m: Layer64): int {.base.} =
+  quit "to override!"
+
 method forward*(m: Layer32, v: DVector32): DVector32 {.base.} =
   quit "to override!"
 

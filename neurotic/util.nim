@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sequtils
 import linalg
 
 proc sumColumns*(m: DMatrix32 or DMatrix64): auto =
@@ -29,3 +30,11 @@ proc repeat*(a: DVector32 or DVector64, n: int): auto =
 proc oneHot*(i, size: int): DVector64 =
   result = zeros(size)
   result[i] = 1.0
+
+proc split*(v: DVector32 or DVector64, sizes: seq[int]): auto =
+  assert v.len == foldl(sizes, a + b)
+  var count = 0
+  result = newSeq[type(v)]()
+  for size in sizes:
+    result.add(v[count ..< count + size])
+    count += size

@@ -29,10 +29,12 @@ type
     weights*, gradWeights*: DMatrix64
     bias*, gradBias*: DVector64
   Dense32Layer* = ref object of Layer32
+    a, b: int
     memory*: Dense32Memory
     lastInput: DVector32
     lastInputs: DMatrix32
   Dense64Layer* = ref object of Layer64
+    a, b: int
     memory*: Dense64Memory
     lastInput: DVector64
     lastInputs: DMatrix64
@@ -59,10 +61,10 @@ proc memory*(d: Dense64): Dense64Memory =
   )
 
 proc withMemory*(d: Dense32, m: Dense32Memory): Dense32Layer =
-  Dense32Layer(memory: m)
+  Dense32Layer(a: d.a, b: d.b, memory: m)
 
 proc withMemory*(d: Dense64, m: Dense64Memory): Dense64Layer =
-  Dense64Layer(memory: m)
+  Dense64Layer(a: d.a, b: d.b, memory: m)
 
 proc withMemory*(d: Dense32 or Dense64): auto = d.withMemory(d.memory)
 
@@ -114,3 +116,11 @@ method backward*(m: Dense32Layer, x: DMatrix32, eta: float32): DMatrix32 =
 
 method backward*(m: Dense64Layer, x: DMatrix64, eta: float64): DMatrix64 =
   backwardMatrix(m, x, eta)
+
+method inputSize*(m: Dense32Layer): int = m.a
+
+method inputSize*(m: Dense64Layer): int = m.a
+
+method outputSize*(m: Dense32Layer): int = m.b
+
+method outputSize*(m: Dense64Layer): int = m.b

@@ -64,3 +64,9 @@ proc sequential*(modules: seq[Layer32]): Sequential32 =
 
 proc sequential*(modules: seq[Layer64]): Sequential64 =
   Sequential64(modules: @modules)
+
+method inputSize*(s: Sequential64): int =
+  s.modules[0].inputSize
+
+method outputSize*(s: Sequential64): int =
+  s.modules[s.modules.high].outputSize
