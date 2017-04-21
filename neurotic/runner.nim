@@ -83,6 +83,8 @@ template miniBatchSgdT(m, c, data, batchSize, eta: untyped) =
     count = 0
     loss = 0.0
   while count < data.len:
+    write(stdout, ".")
+    stdout.flushFile
     let
       (input, output) = data.batch(count, batchSize)
       res = run(m, c, input, output, eta)

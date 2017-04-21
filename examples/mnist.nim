@@ -26,8 +26,8 @@ proc adjustTrain(x: (DMatrix64, int)): TrainingData64 =
 
 proc main() =
   let
-    l1 = dense(784, 50)
-    l2 = dense(50, 10)
+    l1 = dense(784, 512)
+    l2 = dense(512, 10)
     cost = QuadraticCost()
   var
     m1 = l1.withMemory
