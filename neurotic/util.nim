@@ -38,3 +38,6 @@ proc split*(v: DVector32 or DVector64, sizes: seq[int]): auto =
   for size in sizes:
     result.add(v[count ..< count + size])
     count += size
+
+proc `[]`*(m: DMatrix32 or DMatrix64, s: Slice[int]): type(m) =
+  makeMatrixIJD(m.M, s.b - s.a + 1, m[i, j + s.a])
