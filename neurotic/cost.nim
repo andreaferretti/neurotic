@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import linalg
+import linalg, math
 
 type
   QuadraticCost* = object
@@ -35,29 +35,35 @@ proc backward*(m: QuadraticCost, x, y: DVector64): DVector64 = 2 * (x - y)
 proc backward*(m: QuadraticCost, x, y: DMatrix64): DMatrix64 = 2 * (x - y)
 
 proc forward*(m: CrossEntropyCost, x, y: DVector32): float32 =
-  -(x * y) + log(l_1(exp(x)))
+  -(x * y) # + ln(l_1(x))
 
 proc forward*(m: CrossEntropyCost, x, y: DMatrix32): float32 =
-  -(x.asVector * y.asVector) + log(l_1(exp(x)))
+  -(x.asVector * y.asVector) # + ln(l_1(x))
 
 proc forward*(m: CrossEntropyCost, x, y: DVector64): float64 =
-  -(x * y) + log(l_1(exp(x)))
+  -(x * y) # + ln(l_1(x))
 
 proc forward*(m: CrossEntropyCost, x, y: DMatrix64): float64 =
-  -(x.asVector * y.asVector) + log(l_1(exp(x)))
+  -(x.asVector * y.asVector) # + ln(l_1(x))
 
 proc backward*(m: CrossEntropyCost, x, y: DVector32): DVector32 =
-  let e = exp(x)
-  return (e / l_1(e)) - y
+  -1 * y
+  # let e = 1'f32 / l_1(x)
+  # return constantVector(x.len, e) - y
 
 proc backward*(m: CrossEntropyCost, x, y: DMatrix32): DMatrix32 =
-  let e = exp(x)
-  return (e / l_1(e)) - y
+  -1 * y
+  # let e = 1'f32 / l_1(x)
+  # let (m, n) = x.dim
+  # return constantMatrix(m, n, e) - y
 
 proc backward*(m: CrossEntropyCost, x, y: DVector64): DVector64 =
-  let e = exp(x)
-  return (e / l_1(e)) - y
+  -1 * y
+  # let e = 1'f64 / l_1(x)
+  # return constantVector(x.len, e) - y
 
 proc backward*(m: CrossEntropyCost, x, y: DMatrix64): DMatrix64 =
-  let e = exp(x)
-  return (e / l_1(e)) - y
+  -1 * y
+  # let e = 1'f64 / l_1(x)
+  # let (m, n) = x.dim
+  # return constantMatrix(m, n, e) - y

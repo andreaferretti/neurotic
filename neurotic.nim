@@ -13,8 +13,8 @@
 # limitations under the License.
 
 import neurotic/core, neurotic/cost, neurotic/dense, neurotic/activation,
-  neurotic/sequential, neurotic/runner, neurotic/util,
+  neurotic/softmax, neurotic/sequential, neurotic/runner, neurotic/util,
   neurotic/evaluation, neurotic/getmnist, neurotic/viz
 
-export core, cost, dense, activation, sequential, runner, util,
+export core, cost, dense, activation, softmax, sequential, runner, util,
   evaluation, getmnist, viz

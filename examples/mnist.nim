@@ -28,13 +28,14 @@ proc main() =
   let
     l1 = dense(784, 512)
     l2 = dense(512, 10)
-    cost = QuadraticCost()
+    cost = CrossEntropyCost()
   var
     m1 = l1.withMemory
     # m2 = sigmoidModule()
     m2 = reluModule()
     m3 = l2.withMemory
-    m4 = sequential(@[m1, m2, m3])
+    m4 = softMax()
+    m5 = sequential(@[m1, m2, m3, m4])
 
   let data = mnistTrainData().map(adjustTrain)
   for j in 0 .. 10:
@@ -42,11 +43,11 @@ proc main() =
     discard savePNG(x.asMatrix(28, 28), "mnist-" & $j & ".png")
 
   for _ in 1 .. 10:
-    # sgd(m4, cost, data)
-    miniBatchSgd(m4, cost, data)
+    sgd(m5, cost, data)
+    # miniBatchSgd(m5, cost, data)
 
   let testData = mnistTestData().map(adjustTest)
-  let rightAnswers = m4.evaluate(testData)
+  let rightAnswers = m5.evaluate(testData)
   let perc = rightAnswers.float * 100.0 / testData.len.float
   echo "Right answers: ", rightAnswers, " out of ", testData.len
   echo "Perc: ", perc, "%"
