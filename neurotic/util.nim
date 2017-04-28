@@ -39,6 +39,18 @@ proc split*(v: DVector32 or DVector64, sizes: seq[int]): auto =
     result.add(v[count ..< count + size])
     count += size
 
+proc inverse*(v: DVector32 or DVector64): auto =
+  result = v.clone()
+  for i in 0 ..< result.len:
+    result[i] = 1 / result[i]
+
+proc inverse*(v: DMatrix32 or DMatrix64): auto =
+  result = v.clone()
+  let (a, b) = v.dim
+  for i in 0 ..< a:
+    for j in 0 ..< b:
+      result[i, j] = 1 / result[i, j]
+
 proc vertical*(v: DVector32 or DVector64): auto =
   v.asMatrix(v.len, 1)
 
