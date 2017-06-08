@@ -29,10 +29,10 @@ proc backward*[A: SomeReal](m: QuadraticCost, x, y: Vector[A]): Vector[A] = 2 * 
 
 proc backward*[A: SomeReal](m: QuadraticCost, x, y: Matrix[A]): Matrix[A] = 2 * (x - y)
 
-proc forward*[A: SomeReal](m: CrossEntropyCost, x, y: Vector[A]): float32 =
+proc forward*[A: SomeReal](m: CrossEntropyCost, x, y: Vector[A]): A =
   -(ln(x) * y) # + ln(l_1(x))
 
-proc forward*[A: SomeReal](m: CrossEntropyCost, x, y: Matrix[A]): float32 =
+proc forward*[A: SomeReal](m: CrossEntropyCost, x, y: Matrix[A]): A =
   -(ln(x.asVector) * y.asVector) # + ln(l_1(x))
 
 proc backward*[A: SomeReal](m: CrossEntropyCost, x, y: Vector[A]): Vector[A] =
