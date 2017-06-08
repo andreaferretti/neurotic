@@ -13,56 +13,45 @@
 # limitations under the License.
 
 import sequtils
-import linalg
+import neo
 
-proc sumColumns*(m: DMatrix32 or DMatrix64): auto =
-  let (a, _) = m.dim
-  when m is DMatrix32:
-    result = zeros(a, float32)
-  else:
-    result = zeros(a)
+proc sumColumns*[A: SomeReal](m: Matrix[A]): Vector[A] =
+  result = zeros(m.N, A)
   for col in columns(m):
     result += col
 
-proc repeat*(a: DVector32 or DVector64, n: int): auto =
-  makeMatrix(a.len, n, proc(i, j: int): auto = a[i])
+proc repeat*[A](a: Vector[A], n: int): auto =
+  makeMatrixIJ(A, a.len, n, a[i])
 
-proc oneHot*(i, size: int): DVector64 =
+proc oneHot*(i, size: int): Vector[float64] =
   result = zeros(size)
   result[i] = 1.0
 
-proc split*(v: DVector32 or DVector64, sizes: seq[int]): auto =
+proc split*[A](v: Vector[A], sizes: seq[int]): auto =
   assert v.len == foldl(sizes, a + b)
   var count = 0
-  result = newSeq[type(v)]()
+  result = newSeq[Vector[A]]()
   for size in sizes:
     result.add(v[count ..< count + size])
     count += size
 
-proc inverse*(v: DVector32 or DVector64): auto =
+proc inverse*[A: SomeReal](v: Vector[A]): auto =
   result = v.clone()
   for i in 0 ..< result.len:
     result[i] = 1 / result[i]
 
-proc inverse*(v: DMatrix32 or DMatrix64): auto =
-  result = v.clone()
-  let (a, b) = v.dim
-  for i in 0 ..< a:
-    for j in 0 ..< b:
-      result[i, j] = 1 / result[i, j]
+proc inverse*[A: SomeReal](m: Matrix[A]): auto =
+  result = m.clone()
+  for i in 0 ..< m.M * m.N:
+    result.data[i] = 1 / result.data[i]
 
-proc vertical*(v: DVector32 or DVector64): auto =
+proc vertical*[A](v: Vector[A]): auto =
   v.asMatrix(v.len, 1)
 
-proc horizontal*(v: DVector32 or DVector64): auto =
+proc horizontal*[A](v: Vector[A]): auto =
   v.asMatrix(1, v.len)
 
-proc diagonal*(v: DVector32): DMatrix32 =
-  result = zeros(v.len, v.len, float32)
-  for i, j in v:
-    result[i, i] = v[i]
-
-proc diagonal*(v: DVector64): DMatrix64 =
-  result = zeros(v.len, v.len)
+proc diagonal*[A: SomeReal](v: Vector[A]): Matrix[A] =
+  result = zeros(v.len, v.len, A)
   for i, j in v:
     result[i, i] = v[i]

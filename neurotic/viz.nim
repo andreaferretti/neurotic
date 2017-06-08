@@ -12,12 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import linalg, nimPNG
+import neo, nimPNG
 
-proc savePNG*(x: DMatrix64 or DMatrix32, name: string): bool =
-  let v = x.asVector
-  let (M, N) = x.dim
+proc savePNG*[A: SomeReal](m: Matrix[A], name: string): bool =
+  let v = m.asVector
   var s = newString(v.len)
   for i in 0 ..< v.len:
     s[i] = char(int8(v[i] * 256))
-  return savePNG(name, s, LCT_GREY, 8, M, N)
+  return savePNG(name, s, LCT_GREY, 8, m.M, m.N)

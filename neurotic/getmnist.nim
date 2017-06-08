@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import streams, endians, sequtils, os, httpclient
-import linalg
+import neo
 
 proc readInt32BE(s: FileStream): int =
   var r = s.readInt32()
@@ -21,7 +21,7 @@ proc readInt32BE(s: FileStream): int =
   bigEndian32(addr tmp, addr r)
   result = tmp
 
-proc loadImgFile(imgFile: string, maxEntries = high(int)): seq[DMatrix64] =
+proc loadImgFile(imgFile: string, maxEntries = high(int)): seq[Matrix[float64]] =
   var s = newFileStream(imgFile, fmRead)
   let magic = s.readInt32BE()
   assert(magic == 2051)

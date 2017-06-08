@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import linalg
+import neo
 import ./core
 
-template classifyT(m, input, result: untyped) =
+proc classify*[A: SomeReal](m: Layer[A], input: Vector[A]): int =
   let output = m.forward(input)
   var maxValue = output[0]
   for i, v in output:
@@ -23,19 +23,9 @@ template classifyT(m, input, result: untyped) =
       maxValue = v
       result = i
 
-proc classify*(m: Layer32, input: DVector32): int = classifyT(m, input, result)
-
-proc classify*(m: Layer64, input: DVector64): int = classifyT(m, input, result)
-
-template evaluateT(m, testData, result: untyped) =
+proc evaluate*[A: SomeReal](m: Layer[A], testData: seq[(Vector[A], int)]): int =
   result = 0
   for x in testData:
     let (input, label) = x
     if label == m.classify(input):
       result += 1
-
-proc evaluate*(m: Layer32, testData: seq[(DVector32, int)]): int =
-  evaluateT(m, testData, result)
-
-proc evaluate*(m: Layer64, testData: seq[(DVector64, int)]): int =
-  evaluateT(m, testData, result)

@@ -12,18 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import linalg
+import neo
 import ./core, ./cost
 
 type
-  Result32* = object
-    loss*: float32
-  Result64* = object
-    loss*: float64
-  TrainingData32* = tuple
-    input, output: DVector32
-  TrainingData64* = tuple
-    input, output: DVector64
+  Result*[A] = object
+    loss*: A
+  TrainingData*[A] = tuple
+    input, output: Vector[A]
 
 template runT(m, c, input, output, eta, result: untyped) =
   let
@@ -33,19 +29,13 @@ template runT(m, c, input, output, eta, result: untyped) =
     gradient = m.backward(firstGradient, eta)
   result.loss = loss
 
-proc run*(m: Layer32, c: Cost32, input, output: DVector32, eta = 0.01'f32): Result32 =
+proc run*[A: SomeReal](m: Layer[A], c: Cost[A], input, output: Vector[A], eta: A = 0.01): Result[A] =
   runT(m, c, input, output, eta, result)
 
-proc run*(m: Layer64, c: Cost64, input, output: DVector64, eta = 0.01'f64): Result64 =
+proc run*[A: SomeReal](m: Layer[A], c: Cost[A], input, output: Matrix[A], eta: A = 0.01): Result[A] =
   runT(m, c, input, output, eta, result)
 
-proc run*(m: Layer32, c: Cost32, input, output: DMatrix32, eta = 0.01'f32): Result32 =
-  runT(m, c, input, output, eta, result)
-
-proc run*(m: Layer64, c: Cost64, input, output: DMatrix64, eta = 0.01'f64): Result64 =
-  runT(m, c, input, output, eta, result)
-
-template sgdT(m, c, data, eta: untyped) =
+proc sgd*[A: SomeReal](m: Layer[A], c: Cost[A], data: seq[TrainingData[A]], eta: A = 0.01) =
   var
     count = 0
     loss = 0.0
@@ -57,28 +47,18 @@ template sgdT(m, c, data, eta: untyped) =
     count += 1
   echo "loss: ", (loss / count.float)
 
-proc sgd*(m: Layer32, c: Cost32, data: seq[TrainingData32], eta = 0.01'f32) =
-  sgdT(m, c, data, eta)
 
-proc sgd*(m: Layer64, c: Cost64, data: seq[TrainingData64], eta = 0.01'f64) =
-  sgdT(m, c, data, eta)
-
-template batchT(data, start, size, result: untyped) =
+proc batch*[A: SomeReal](data: seq[TrainingData[A]], start, size: int): tuple[input, output: Matrix[A]] =
   let
     inputSize = data[0].input.len
     outputSize = data[0].output.len
   block:
-    result.input = makeMatrixIJD(inputSize, size, data[start + j].input[i])
+    result.input = makeMatrixIJ(A, inputSize, size, data[start + j].input[i])
   block:
-    result.output = makeMatrixIJD(outputSize, size, data[start + j].output[i])
+    result.output = makeMatrixIJ(A, outputSize, size, data[start + j].output[i])
 
-proc batch*(data: seq[TrainingData32], start, size: int): tuple[input, output: DMatrix32] =
-  batchT(data, start, size, result)
 
-proc batch*(data: seq[TrainingData64], start, size: int): tuple[input, output: DMatrix64] =
-  batchT(data, start, size, result)
-
-template miniBatchSgdT(m, c, data, batchSize, eta: untyped) =
+proc miniBatchSgd*[A: SomeReal](m: Layer[A], c: Cost[A], data: seq[TrainingData[A]], batchSize = 100, eta: A = 0.01) =
   var
     count = 0
     loss = 0.0
@@ -89,9 +69,3 @@ template miniBatchSgdT(m, c, data, batchSize, eta: untyped) =
     loss += res.loss
     count += batchSize
   echo "loss: ", (loss / count.float)
-
-proc miniBatchSgd*(m: Layer32, c: Cost32, data: seq[TrainingData32], batchSize = 100, eta = 0.01'f32) =
-  miniBatchSgdT(m, c, data, batchSize, eta)
-
-proc miniBatchSgd*(m: Layer64, c: Cost64, data: seq[TrainingData64], batchSize = 100, eta = 0.01'f64) =
-  miniBatchSgdT(m, c, data, batchSize, eta)

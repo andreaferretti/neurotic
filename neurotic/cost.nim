@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import linalg, math
+import neo, math
 import ./util
 
 makeUniversal(ln)
@@ -21,42 +21,22 @@ type
   QuadraticCost* = object
   CrossEntropyCost* = object
 
-proc forward*(m: QuadraticCost, x, y: DVector32): float32 = l_2(x - y)
+proc forward*[A: SomeReal](m: QuadraticCost, x, y: Vector[A]): A = l_2(x - y)
 
-proc forward*(m: QuadraticCost, x, y: DMatrix32): float32 = l_2(x - y)
+proc forward*[A: SomeReal](m: QuadraticCost, x, y: Matrix[A]): A = l_2(x - y)
 
-proc forward*(m: QuadraticCost, x, y: DVector64): float64 = l_2(x - y)
+proc backward*[A: SomeReal](m: QuadraticCost, x, y: Vector[A]): Vector[A] = 2 * (x - y)
 
-proc forward*(m: QuadraticCost, x, y: DMatrix64): float64 = l_2(x - y)
+proc backward*[A: SomeReal](m: QuadraticCost, x, y: Matrix[A]): Matrix[A] = 2 * (x - y)
 
-proc backward*(m: QuadraticCost, x, y: DVector32): DVector32 = 2 * (x - y)
-
-proc backward*(m: QuadraticCost, x, y: DMatrix32): DMatrix32 = 2 * (x - y)
-
-proc backward*(m: QuadraticCost, x, y: DVector64): DVector64 = 2 * (x - y)
-
-proc backward*(m: QuadraticCost, x, y: DMatrix64): DMatrix64 = 2 * (x - y)
-
-proc forward*(m: CrossEntropyCost, x, y: DVector32): float32 =
+proc forward*[A: SomeReal](m: CrossEntropyCost, x, y: Vector[A]): float32 =
   -(ln(x) * y) # + ln(l_1(x))
 
-proc forward*(m: CrossEntropyCost, x, y: DMatrix32): float32 =
+proc forward*[A: SomeReal](m: CrossEntropyCost, x, y: Matrix[A]): float32 =
   -(ln(x.asVector) * y.asVector) # + ln(l_1(x))
 
-proc forward*(m: CrossEntropyCost, x, y: DVector64): float64 =
-  -(ln(x) * y) # + ln(l_1(x))
-
-proc forward*(m: CrossEntropyCost, x, y: DMatrix64): float64 =
-  -(ln(x.asVector) * y.asVector) # + ln(l_1(x))
-
-proc backward*(m: CrossEntropyCost, x, y: DVector32): DVector32 =
+proc backward*[A: SomeReal](m: CrossEntropyCost, x, y: Vector[A]): Vector[A] =
   -1 * (x.inverse |*| y)
 
-proc backward*(m: CrossEntropyCost, x, y: DMatrix32): DMatrix32 =
-  -1 * (x.inverse |*| y)
-
-proc backward*(m: CrossEntropyCost, x, y: DVector64): DVector64 =
-  -1 * (x.inverse |*| y)
-
-proc backward*(m: CrossEntropyCost, x, y: DMatrix64): DMatrix64 =
+proc backward*[A: SomeReal](m: CrossEntropyCost, x, y: Matrix[A]): Matrix[A] =
   -1 * (x.inverse |*| y)

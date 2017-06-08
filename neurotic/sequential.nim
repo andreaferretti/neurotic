@@ -13,29 +13,19 @@
 # limitations under the License.
 
 import sequtils, macros
-import linalg
+import neo
 import ./core
 
 type
-  Sequential32* = ref object of Layer32
-    modules: seq[Layer32]
-  Sequential64* = ref object of Layer64
-    modules: seq[Layer64]
+  Sequential*[A] = ref object of Layer[A]
+    modules: seq[Layer[A]]
 
-proc add*(m: var Sequential32, layer: Layer32) = m.modules.add(layer)
+proc add*[A: SomeReal](m: var Sequential[A], layer: Layer[A]) = m.modules.add(layer)
 
-proc add*(m: var Sequential64, layer: Layer64) = m.modules.add(layer)
-
-method forward*(m: Sequential32, x: DVector32): auto =
+method forward*[A: SomeReal](m: Sequential[A], x: Vector[A]): auto =
   m.modules.foldl(b.forward(a), x)
 
-method forward*(m: Sequential32, x: DMatrix32): auto =
-  m.modules.foldl(b.forward(a), x)
-
-method forward*(m: Sequential64, x: DVector64): auto =
-  m.modules.foldl(b.forward(a), x)
-
-method forward*(m: Sequential64, x: DMatrix64): auto =
+method forward*[A: SomeReal](m: Sequential[A], x: Matrix[A]): auto =
   m.modules.foldl(b.forward(a), x)
 
 template backwardT(m, x, eta, result: untyped) =
@@ -43,30 +33,19 @@ template backwardT(m, x, eta, result: untyped) =
   for i in countdown(m.modules.high, m.modules.low):
     result = m.modules[i].backward(result, eta)
 
-method backward*(m: Sequential32, x: DVector32, eta: float32): DVector32 =
+method backward*[A: SomeReal](m: Sequential[A], x: Vector[A], eta: float32): Vector[A] =
   backwardT(m, x, eta, result)
 
-method backward*(m: Sequential64, x: DVector64, eta: float64): DVector64 =
+method backward*[A: SomeReal](m: Sequential[A], x: Matrix[A], eta: float32): Matrix[A] =
   backwardT(m, x, eta, result)
 
-method backward*(m: Sequential32, x: DMatrix32, eta: float32): DMatrix32 =
-  backwardT(m, x, eta, result)
+proc `->`*[A: SomeReal](a, b: Layer[A]): Sequential[A] = Sequential[A](modules: @[a, b])
 
-method backward*(m: Sequential64, x: DMatrix64, eta: float64): DMatrix64 =
-  backwardT(m, x, eta, result)
+proc sequential*[A: SomeReal](modules: seq[Layer[A]]): Sequential[A] =
+  Sequential[A](modules: @modules)
 
-proc `->`*(a, b: Layer32): Sequential32 = Sequential32(modules: @[a, b])
-
-proc `->`*(a, b: Layer64): Sequential64 = Sequential64(modules: @[a, b])
-
-proc sequential*(modules: seq[Layer32]): Sequential32 =
-  Sequential32(modules: @modules)
-
-proc sequential*(modules: seq[Layer64]): Sequential64 =
-  Sequential64(modules: @modules)
-
-method inputSize*(s: Sequential64): int =
+method inputSize*[A](s: Sequential[A]): int =
   s.modules[0].inputSize
 
-method outputSize*(s: Sequential64): int =
+method outputSize*[A](s: Sequential[A]): int =
   s.modules[s.modules.high].outputSize

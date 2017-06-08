@@ -13,13 +13,13 @@
 # limitations under the License.
 
 import sequtils
-import neurotic, linalg, nimPNG
+import neurotic, neo, nimPNG
 
-proc adjustTest(x: (DMatrix64, int)): (DVector64, int) =
+proc adjustTest[A: SomeReal](x: (Matrix[A], int)): (Vector[A], int) =
   let (m, i) = x
   (m.asVector, i)
 
-proc adjustTrain(x: (DMatrix64, int)): TrainingData64 =
+proc adjustTrain[A](x: (Matrix[A], int)): TrainingData[A] =
   let (m, label) = x
   return (input: m.asVector, output: oneHot(label, 10))
 
@@ -28,14 +28,15 @@ proc main() =
   let
     l1 = dense(784, 512)
     l2 = dense(512, 10)
-    cost = CrossEntropyCost()
+    # cost = CrossEntropyCost()
+    cost = QuadraticCost()
   var
     m1 = l1.withMemory
     # m2 = sigmoidModule()
-    m2 = reluModule()
+    m2 = reluModule(float64)
     m3 = l2.withMemory
-    m4 = softMax()
-    m5 = sequential(@[m1, m2, m3, m4])
+    m4 = softMax(float64)
+    m5 = sequential(@[m1, m2, m3])
 
   let data = mnistTrainData().map(adjustTrain)
   for j in 0 .. 10:
@@ -43,8 +44,8 @@ proc main() =
     discard savePNG(x.asMatrix(28, 28), "mnist-" & $j & ".png")
 
   for _ in 1 .. 10:
-    sgd(m5, cost, data)
-    # miniBatchSgd(m5, cost, data)
+    # sgd(m5, cost, data)
+    miniBatchSgd(m5, cost, data)
 
   let testData = mnistTestData().map(adjustTest)
   let rightAnswers = m5.evaluate(testData)

@@ -12,32 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import linalg
+import neo
 import ./core, ./util
 
 type
-  SoftMax32* = ref object of Layer32
-    lastOutput: DVector32
-    lastOutputs: DMatrix32
-  SoftMax64* = ref object of Layer64
-    lastOutput: DVector64
-    lastOutputs: DMatrix64
+  SoftMax*[A] = ref object of Layer[A]
+    lastOutput: Vector[A]
+    lastOutputs: Matrix[A]
 
 proc exp1(z: float32 or float64): auto = exp(z)
 
 makeUniversal(exp1)
 
-proc softMax32*(): SoftMax32 =
+proc softMax*(A: typedesc): SoftMax[A] =
   new result
 
-proc softMax*(): SoftMax64 =
-  new result
-
-proc softMax*(v: DVector32 or DVector64): auto =
+proc softMax*[A: SomeReal](v: Vector[A]): auto =
   let y = exp1(v)
   return y / l_1(y)
 
-proc softMax*(m: DMatrix32 or DMatrix64): auto =
+proc softMax*[A: SomeReal](m: Matrix[A]): auto =
   result = exp1(m)
   let (a, b) = m.dim
   var v = zeros(b)
@@ -48,34 +42,18 @@ proc softMax*(m: DMatrix32 or DMatrix64): auto =
     for j in 0 ..< b:
       result[i, j] = result[i, j] / v[j]
 
-method forward*(a: SoftMax32, x: DVector32): DVector32 =
+method forward*[A: SomeReal](a: SoftMax[A], x: Vector[A]): Vector[A] =
   result = softMax(x)
   a.lastOutput = result
 
-method forward*(a: SoftMax32, x: DMatrix32): DMatrix32 =
+method forward*[A: SomeReal](a: SoftMax[A], x: Matrix[A]): Matrix[A] =
   result = softMax(x)
   a.lastOutputs = result
 
-method backward*(a: SoftMax32, v: DVector32, eta: float32): DVector32 =
+method backward*[A: SomeReal](a: SoftMax[A], v: Vector[A], eta: A): Vector[A] =
   # let jacobian = a.lastOutput.diagonal - (a.lastOutput.vertical * a.lastOutput.horizontal)
   # return jacobian * v
   (a.lastOutput |*| v) - ((a.lastOutput * v) * a.lastOutput)
 
-method backward*(a: SoftMax32, v: DMatrix32, eta: float32): DMatrix32 =
-  (a.lastOutputs |*| v) - (a.lastOutputs * (a.lastOutputs.t * v))
-
-method forward*(a: SoftMax64, x: DVector64): DVector64 =
-  result = softMax(x)
-  a.lastOutput = result
-
-method forward*(a: SoftMax64, x: DMatrix64): DMatrix64 =
-  result = softMax(x)
-  a.lastOutputs = result
-
-method backward*(a: SoftMax64, v: DVector64, eta: float64): DVector64 =
-  # let jacobian = a.lastOutput.diagonal - (a.lastOutput.vertical * a.lastOutput.horizontal)
-  # return jacobian * v
-  (a.lastOutput |*| v) - ((a.lastOutput * v) * a.lastOutput)
-
-method backward*(a: SoftMax64, v: DMatrix64, eta: float64): DMatrix64 =
+method backward*[A: SomeReal](a: SoftMax[A], v: Matrix[A], eta: A): Matrix[A] =
   (a.lastOutputs |*| v) - (a.lastOutputs * (a.lastOutputs.t * v))
