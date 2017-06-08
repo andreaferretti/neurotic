@@ -33,10 +33,10 @@ template backwardT(m, x, eta, result: untyped) =
   for i in countdown(m.modules.high, m.modules.low):
     result = m.modules[i].backward(result, eta)
 
-method backward*[A: SomeReal](m: Sequential[A], x: Vector[A], eta: float32): Vector[A] =
+method backward*[A: SomeReal](m: Sequential[A], x: Vector[A], eta: A): Vector[A] =
   backwardT(m, x, eta, result)
 
-method backward*[A: SomeReal](m: Sequential[A], x: Matrix[A], eta: float32): Matrix[A] =
+method backward*[A: SomeReal](m: Sequential[A], x: Matrix[A], eta: A): Matrix[A] =
   backwardT(m, x, eta, result)
 
 proc `->`*[A: SomeReal](a, b: Layer[A]): Sequential[A] = Sequential[A](modules: @[a, b])
