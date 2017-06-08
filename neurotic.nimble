@@ -17,10 +17,3 @@ task mnist, "compile MNIST example":
   --path:"."
   --run
   setCommand "c", "examples/mnist.nim"
-
-task mnist32, "compile MNIST example (32-bit)":
-  --define:openblas
-  --define:release
-  --path:"."
-  --run
-  setCommand "c", "examples/mnist32.nim"
